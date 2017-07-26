@@ -1,0 +1,114 @@
+---
+swagger: "2.0"
+info:
+  version: "0.0.1"
+  title: "Abbreviate On Demand"
+host: "localhost:10010"
+basePath: "/"
+schemes:
+- "http"
+- "https"
+consumes:
+- "application/json"
+produces:
+- "application/json"
+paths:
+  /abbreviate:
+    get:
+      summary: "Returns abbreviated word/sentence to the caller"
+      operationId: "abbreviate"
+      tags: 
+      - "Abbreviation API"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "word"
+        in: "query"
+        description: "The word to be abbreviated"
+        required: true
+        type: "string"
+      - name: "length"
+        in: "query"
+        description: "The final length of the abbreviated word"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/AbbreviateResponse"
+        default:
+          description: "Error"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+      x-swagger-router-controller: "aod"
+  /abbreviatelist:
+    post:
+      summary: "Returns an array of abbreviated objects to the caller"
+      operationId: "abbreviatelist"
+      tags: 
+      - "Abbreviation API"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Array of JSON objects to be abbreviated to specified length"
+        required: true
+        schema:
+          type: "array"
+          items:
+            $ref: "#/definitions/AbbreviateListRequest"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/AbbreviateListResponse"
+        default:
+          description: "Error"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+      x-swagger-router-controller: "aod"
+  /swagger:
+    x-swagger-pipe: "swagger_raw"
+definitions:
+  AbbreviateResponse:
+    required:
+    - "abbr"
+    - "length"
+    - "word"
+    properties:
+      word:
+        type: "string"
+      abbr:
+        type: "string"
+      length:
+        type: "integer"
+  AbbreviateListRequest:
+    type: "object"
+    properties:
+        word:
+            type: "string"
+        length:
+            type: "integer"
+  AbbreviateListResponse:
+    type: "object"
+    properties:
+      word:
+        type: "string"
+      abbr:
+        type: "string"
+      length:
+        type: "integer"
+  ErrorResponse:
+    required:
+    - "message"
+    properties:
+      message:
+        type: "string"
