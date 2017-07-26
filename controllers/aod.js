@@ -56,7 +56,7 @@ function abbreviate(word, size) {
         return "ERROR: ZERO LENGTH";
     }
 
-    if (word.length > size) {
+    if (size > word.length) {
         return "ERROR: LENGTH MUST BE LESS THAN WORD LENGTH"
     }
     
