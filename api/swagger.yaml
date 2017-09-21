@@ -3,8 +3,8 @@ swagger: "2.0"
 info:
   version: "0.0.1"
   title: "Abbreviate On Demand"
-host: "vialab.science.uoit.ca"
-basePath: "/abbreviateAPI"
+host: "abbreviation.vialab.science.uoit.ca"
+basePath: "/"
 schemes:
 - "http"
 - "https"
