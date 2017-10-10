@@ -67,7 +67,7 @@ Returns:
 
 
 # Algorithm details
-For details on how the algorithm decides on which letter to drop and keep, please refer to [project page]http://vialab.science.uoit.ca/portfolio/an-adaptive-crowdsourced-investigation-of-word-abbreviation-techniques-for-text-visualizations).
+For details on how the algorithm decides on which letter to drop and keep, please refer to [project page](http://vialab.science.uoit.ca/portfolio/an-adaptive-crowdsourced-investigation-of-word-abbreviation-techniques-for-text-visualizations).
 
 # Swagger generated server - technical details
 
