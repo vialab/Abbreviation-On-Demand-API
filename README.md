@@ -13,7 +13,7 @@ npm start
 To view the Swagger UI interface:
 
 ```
-open http://localhost:10010/docs
+open http://localhost:10010/
 ```
 
 This project leverages the mega-awesome [swagger-tools](https://github.com/apigee-127/swagger-tools) middleware which does most all the work.
@@ -22,10 +22,11 @@ This project leverages the mega-awesome [swagger-tools](https://github.com/apige
 The API supports two main functions; abbreviating a word, and abbreviating a list. The API entry point (controller) to the Abbreviation On Demand algorithm can be found at:
 
 ```
+./api/swagger.yaml
 ./controllers/aod.js
 ```
 
-In the controller NodeJS file, the module exports are mappings between the /paths and specific javascript functions that support input for processing output from the algorithm. As the algorithm is able to function as a stand alone library, wrapper functions within the NodeJS file have also been provided to exemplify how simply the Abbreviation On Demand algorithm can be integrated.
+In the controller NodeJS file (aod.js), the module exports are mappings between the /paths (swagger.yaml) and specific javascript functions that support input for processing output from the algorithm. As the algorithm is able to function as a stand alone library, wrapper functions within the NodeJS file have also been provided to exemplify how simply the Abbreviation On Demand algorithm can be integrated.
 
 Abbreviation On Demand specific core functionality (modified for NodeJS support) can be found in:
 
