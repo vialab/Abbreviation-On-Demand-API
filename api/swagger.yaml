@@ -6,7 +6,6 @@ info:
 host: "abbreviation.vialab.science.uoit.ca"
 basePath: "/"
 schemes:
-- "http"
 - "https"
 consumes:
 - "application/json"
