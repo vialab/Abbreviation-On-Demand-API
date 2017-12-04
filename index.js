@@ -36,7 +36,7 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
   app.use(middleware.swaggerRouter(options));
 
   // Serve the Swagger documents and Swagger UI
-  app.use(middleware.swaggerUi());
+  app.use(middleware.swaggerUi({validatorUrl:null}));
 
   // Start the server
   http.createServer(app).listen(serverPort, function () {
