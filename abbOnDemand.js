@@ -5,7 +5,6 @@ convenience when running this code server side.
 - VS 07/25/2017
 *******************************************************************************/
 var csv = require('csvtojson');
-
 module.exports = {
     init_data: init_data,
     abbreviate: abbreviate,
@@ -20,6 +19,7 @@ function init_data() {
     global.matLabel = getLabels(labels);
     global.alpha = {};
     global.correlationMatrix = [];
+    global.useAccuracy = false;
     global.digraph = {}, global.monograph = {}, global.loadedData, global.dropProbability;
     csv().fromFile("./data/abbStudy_data.csv").on("end_parsed", function(data) {
         csv().fromFile("./data/rankbigraph.csv").on("end_parsed", function(rank) {  
@@ -355,6 +355,8 @@ function process2(data){
 }
 
 function calcAccuracy(accuracy){
+    // if we are not using accuracy, return 100% accurate for everything
+    if(!global.useAccuracy) return 1;
     
     var correct = wrong = score = 0;
     for (x in accuracy){        
