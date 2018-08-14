@@ -3,10 +3,12 @@ swagger: "2.0"
 info:
   version: "0.0.1"
   title: "Abbreviate On Demand"
-host: "abbreviation.vialab.science.uoit.ca"
+host: "localhost:10010"
+# host: "abbreviation.vialab.science.uoit.ca"
 basePath: "/"
 schemes:
-- "https"
+- "http"
+# - "https"
 consumes:
 - "application/json"
 produces:
@@ -16,7 +18,7 @@ paths:
     get:
       summary: "Returns abbreviated word/sentence to the caller"
       operationId: "abbreviate"
-      tags: 
+      tags:
       - "Abbreviation API"
       consumes:
       - "application/json"
@@ -47,7 +49,7 @@ paths:
     post:
       summary: "Returns an array of abbreviated objects to the caller"
       operationId: "abbreviatelist"
-      tags: 
+      tags:
       - "Abbreviation API"
       consumes:
       - "application/json"

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<link rel="stylesheet" type="text/css" href="style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="wordVis.js"></script>
+
+
+
+<div id=panel>
+    <div><a href="index.html">Homepage</a><br><br></div>
+<span id="word"> </span>
+</div>
+
+
+<script>
+var loadedData, MAX_FONT = 35;
+d3.csv("abbStudy_data.csv", function(data) {
+    d3.csv("phonem.csv", function(pho) {
+        console.log(pho);
+        var phonem = {}, position = [];
+        for(var p in pho){
+            phonem[pho[p].original] = pho[p].Stressed;
+        }
+        loadedData = process(data);
+        displayData(loadedData, phonem);
+    });
+});
+
+
+
+
+
+function displayData(data, pho){
+    var set = {}, position = [];
+    for (var i=0;i<15;i++){
+            position[i] = {p:0, total:0};
+    }
+    for(var key in data){
+        var vec = data[key].vec;
+        var word = [];
+        var indexP = key.lastIndexOf(pho[key]);
+        for (var i in key){
+            if(i>=indexP && i<(indexP+pho[key].length))
+                word[i] = {char:key[i], n:0, p:true};
+            else
+                word[i] = {char:key[i], n:0, p:false};
+        }
+
+        for(var i in vec){
+            var abbr = vec[i].abbr;
+            var before = 0;
+            for(var j in abbr){
+                var w = before, find=-1;
+                while(find==-1 && w<key.length){
+                    if (key.length<13)
+                        position[w].total += parseInt(vec[i].count);
+                    if (abbr[j]==key[w]){
+                        word[w].n += parseInt(vec[i].count);
+                        find=w;
+                        before = w+1;
+                    }
+                    w++;
+                }
+
+                if ((find!=-1) && (key.length<13)){
+                    position[find].p += parseInt(vec[i].count);
+                }
+            }
+        }
+        set[key] = word;
+
+    }
+
+    //var color =  color2 = "PaleVioletRed";
+    var color = "black", color2 = "grey";
+
+    var max = 0 ;
+    for(p in position){
+        if (position[p].total>max)
+            max = position[p].total;
+    }
+//    var spn = "<span>  &nbsp&nbsp&nbsp&nbsp    ";
+//    for(p in position){
+//        spn += "<span id='"+p+"'style='font-size:"+parseInt(100*(parseInt(position[p].p)/parseInt(position[p].total)))+"px;' >M</span>";
+//        console.log(p+","+parseFloat(100*(parseInt(position[p].p)/parseInt(position[p].total))*(position[p].total/max)));
+//    }
+//    spn += "</span>";
+//    $("#panel").html($("#panel").html()+"<BR>"+spn+"<BR>");
+
+    for(var key in set){
+        var word = set[key];
+        var span = "<span id="+key+">  &nbsp&nbsp&nbsp&nbsp    ", original = "";
+        for(var j in word){
+            if(word[j].p){
+                original += '<span style="font-size:35px;color:'+color2+';">'+word[j].char+"</span>";
+                span += '<span style="color:'+color+';font-size:'+ parseInt(MAX_FONT*(parseInt(word[j].n)/parseInt(data[key].total))) + 'px;">' + word[j].char + '</span>';
+            }else{
+                original += '<span style="font-size:35px;color:grey;">'+word[j].char+"</span>";
+                span += '<span style="font-size:'+ parseInt(MAX_FONT*(parseInt(word[j].n)/parseInt(data[key].total))) + 'px;">' + word[j].char + '</span>';
+            }
+        }
+        span+="&nbsp&nbsp&nbsp&nbsp"+original+"</span>";
+        $("#panel").html($("#panel").html()+"<BR>"+span);
+    }
+
+}
+
+
+</script>
+
+<span id="testArea"></span>
