@@ -1,6 +1,6 @@
 /******************************************************************************
-Developer's notes: This abbOnDemand.js was modified so that the functions 
-found in wordVis.js has been appended to it. This change was made for 
+Developer's notes: This abbOnDemand.js was modified so that the functions
+found in wordVis.js has been appended to it. This change was made for
 convenience when running this code server side.
 - VS 07/25/2017
 *******************************************************************************/
@@ -21,12 +21,12 @@ function init_data() {
     global.correlationMatrix = [];
     global.useAccuracy = false;
     global.digraph = {}, global.monograph = {}, global.loadedData, global.dropProbability;
-    csv().fromFile("./data/abbStudy_data.csv").on("end_parsed", function(data) {
-        csv().fromFile("./data/rankbigraph.csv").on("end_parsed", function(rank) {  
+    csv().fromFile("./data/abbStudy_12000.csv").on("end_parsed", function(data) {
+        csv().fromFile("./data/rankbigraph.csv").on("end_parsed", function(rank) {
             global.digraph = processRank(rank);
-            csv().fromFile("./data/monograph.csv").on("end_parsed", function(mono) {         
+            csv().fromFile("./data/monograph.csv").on("end_parsed", function(mono) {
                 csv().fromFile("./data/accuracy.csv").on("end_parsed", function(acc) {
-                    csv().fromFile("./data/dropProbability.csv").on("end_parsed", function(dropProb) {
+                    csv().fromFile("./data/dropProbability_12000.csv").on("end_parsed", function(dropProb) {
                         global.loadedData = process(data);
                         var alphaVector = stats(global.loadedData,global.labels);
                         global.monograph = getDrop(alphaVector);
@@ -48,7 +48,7 @@ abbOnDemand.js - Unmodified
 
 function abbreviateCamelCase(word, size, alpha, digraph, monograph, correlationMatrix, dropProb, labels){
     var letters = [];
-    
+
     var total=0;
     for (a in alpha){
         for(b in alpha[a].pair){
@@ -58,28 +58,28 @@ function abbreviateCamelCase(word, size, alpha, digraph, monograph, correlationM
 
     var dropped = [];
     var scale = getDropProb(dropProb, word.length);
-    
+
     for (var w=0; w<word.length;w++){
         var l = word[w].toUpperCase();
-        
+
         if(word[w]==l){
             var score = 0.0;
         }else{
             if (w==0){
-                var score = parseFloat(monograph[word[w].rank]*(1-scale[w]/100));                
-            }else{                                    
+                var score = parseFloat(monograph[word[w].rank]*(1-scale[w]/100));
+            }else{
                 var score = parseFloat(correlationMatrix[labels.indexOf(word[w-1].toUpperCase())][labels.indexOf(l)] * (1-scale[w]/100));
             }
         }
-        
+
         var letter = {char: word[w], mono: score, deleted: 0};
-        
+
         if (isNaN(letter.mono))
             letter.mono = -1;
 
-        dropped.push(letter);        
+        dropped.push(letter);
     }
-    
+
     var i=0, str="";
     while((countNonDeleted(dropped)>size) && (countNonDeleted(dropped)>0) && (i<countNonDeleted(dropped))){
         i++;
@@ -88,7 +88,7 @@ function abbreviateCamelCase(word, size, alpha, digraph, monograph, correlationM
             if (dropped[i].deleted==0)
                 max = i;
         }
-        
+
         for (a in dropped ){
             if ((dropped[a].deleted==0)&&(dropped[a].mono>=dropped[max].mono)){
                 max = a;
@@ -111,28 +111,28 @@ function abbreviate(word, size, alpha, digraph, monograph, correlationMatrix, dr
 
     var dropped = [];
     var scale = getDropProb(dropProb, word.length);
-    
+
     for (var w=0; w<word.length;w++){
         var l = word[w].toUpperCase();
-        
+
         if (w==0 || word[w-1] == " "){
             var score = parseFloat(monograph[word[w].rank]*(1-scale[w]/100));
-        }else{        
+        }else{
             var score = parseFloat(correlationMatrix[labels.indexOf(word[w-1].toUpperCase())][labels.indexOf(l)] * (1-scale[w]/100));
         }
-        
+
         var letter = {char: word[w], mono: score, deleted: 0};
-        
+
         if (isNaN(letter.mono))
             letter.mono = -1;
 
-        dropped.push(letter);        
+        dropped.push(letter);
     }
 //    console.log(dropped);
-    
-    
+
+
     var i=0, str="";
-    
+
 //    str += " "+ (getAbbreviation(dropped) + "  ,  " + countNonDeleted(dropped));
 
     while((countNonDeleted(dropped)>size) && (countNonDeleted(dropped)>0) && (i<countNonDeleted(dropped))){
@@ -142,21 +142,21 @@ function abbreviate(word, size, alpha, digraph, monograph, correlationMatrix, dr
             if (dropped[i].deleted==0)
                 max = i;
         }
-        
+
         for (a in dropped ){
             if ((dropped[a].deleted==0)&&(dropped[a].mono>=dropped[max].mono)){
                 max = a;
             }
         }
         dropped[max].deleted = 1;
-    }  
-    
+    }
+
     return getAbbreviation(dropped);
 }
 
 function abbreviateTweet(word, size, alpha, digraph, monograph, correlationMatrix, dropProb){
     var letters = [];
-    
+
     var total=0;
     for (a in alpha){
         for(b in alpha[a].pair){
@@ -166,33 +166,33 @@ function abbreviateTweet(word, size, alpha, digraph, monograph, correlationMatri
 
     var dropped = [];
     var scale = getDropProb(dropProb, word.length);
-    
+
     for (var w=0; w<word.length;w++){
         if(word[w].match("[^a-zA-Z]+")){
             var letter = {char: word[w], mono: -1, deleted: 0};
-            
+
         }else{
             var l = word[w].toUpperCase();
-            if (w==0){                
+            if (w==0){
                 var score = parseFloat(monograph[word[w].rank]*(1-scale[w]/100));
             }else {
                 if(word[w-1].match("[^a-zA-Z]+")){
                     var score = parseFloat(monograph[l].rank * (1-scale[w]/100));
-                    var letter = {char: word[w], mono: score, deleted: 0};            
-                }else{        
+                    var letter = {char: word[w], mono: score, deleted: 0};
+                }else{
                     var score = parseFloat(correlationMatrix[labels.indexOf(word[w-1].toUpperCase())][labels.indexOf(l)] * (1-scale[w]/100));
-                }                
+                }
             }
 
             var letter = {char: word[w], mono: score, deleted: 0};
         }
-        
+
         if (isNaN(letter.mono))
             letter.mono = -1;
 
-        dropped.push(letter);        
-    }    
-    
+        dropped.push(letter);
+    }
+
     var i=0, str="";
     while((countNonDeleted(dropped)>size) && (countNonDeleted(dropped)>0) && (i<countNonDeleted(dropped))){
         i++;
@@ -201,7 +201,7 @@ function abbreviateTweet(word, size, alpha, digraph, monograph, correlationMatri
             if (dropped[i].deleted==0)
                 max = i;
         }
-        
+
         for (a in dropped ){
             if ((dropped[a].deleted==0)&&(dropped[a].mono>=dropped[max].mono)){
                 max = a;
@@ -213,11 +213,11 @@ function abbreviateTweet(word, size, alpha, digraph, monograph, correlationMatri
     return getAbbreviation(dropped);
 }
 
-    
+
 function getDropProb(prob, size){
     var aux = [], newScale = [];
     for (var i=0;i<size;i++){
-        newScale[i] = [];    
+        newScale[i] = [];
     }
     var max = size-1;
     for (p in prob){
@@ -282,20 +282,20 @@ function getDrop1(alpha, digraph){
             for(b in alpha[a].pair){
                 var info = alpha[a].pair[b];
                 var c = parseFloat((info.dropAfter/info.max)*(info.max/total)*calcAccuracy(info.accuracy));
-                
+
                 if (c>max)
                     max = c;
-                vec.push(c);    
-            }  
+                vec.push(c);
+            }
             matrix.push(vec);
-        }  
+        }
 
         for (m in matrix){
             for (v in matrix[m]){
                 matrix[m][v] = matrix[m][v] / max;
             }
         }
-    
+
         return matrix;
 }
 
@@ -310,7 +310,7 @@ function process(data){
         if (key in dict){
             var auxObj = dict[key];
             var vec = auxObj.vec;
-            auxObj.total = parseInt(auxObj.total)+parseInt(data[obj].count); 
+            auxObj.total = parseInt(auxObj.total)+parseInt(data[obj].count);
             var aux = {};
             aux.abbr = data[obj].abbreviation;
             aux.count = data[obj].count;
@@ -320,17 +320,17 @@ function process(data){
         }else{
             dict[key] ={total:data[obj].count, vec: [{abbr:data[obj].abbreviation, count:data[obj].count}]};
         }
-    }    
-    return dict;    
+    }
+    return dict;
 }
 
 function getDrop(alpha){
     var matrix = [], str=[];
     for (a in alpha){
         str.push({letter:a, count:parseInt((alpha[a].drop/alpha[a].max)*100)});
-    }                       
+    }
     return str;
-} 
+}
 
 function process2(data){
     var dict = {};
@@ -339,7 +339,7 @@ function process2(data){
         if (key in dict){
             var auxObj = dict[key];
             var vec = auxObj.vec;
-            auxObj.total = parseInt(auxObj.total)+parseInt(data[obj].count); 
+            auxObj.total = parseInt(auxObj.total)+parseInt(data[obj].count);
             var aux = {};
             aux.abbr = data[obj].abbreviation;
             aux.count = data[obj].count;
@@ -350,16 +350,16 @@ function process2(data){
         }else{
             dict[key] ={total:data[obj].count, vec: [{abbr:data[obj].abbreviation, count:data[obj].count, acc:data[obj].accuracy}]};
         }
-    }    
-    return dict;    
+    }
+    return dict;
 }
 
 function calcAccuracy(accuracy){
     // if we are not using accuracy, return 100% accurate for everything
     if(!global.useAccuracy) return 1;
-    
+
     var correct = wrong = score = 0;
-    for (x in accuracy){        
+    for (x in accuracy){
         switch(x) {
             case "correct":
             case "semantic":
@@ -375,7 +375,7 @@ function calcAccuracy(accuracy){
     if (isNaN(score))
         return 0;
     return score;
-    
+
 }
 
 
@@ -384,8 +384,8 @@ function processRank(data){
     for(var obj in data){
         var key = data[obj].digraph;
         dict[key] ={count:data[obj].count, freq: data[obj].freq, rank: data[obj].rank};
-    }    
-    return dict;    
+    }
+    return dict;
 }
 
 function processMonograph(data){
@@ -393,18 +393,18 @@ function processMonograph(data){
     for(var obj in data){
         var key = data[obj].letter;
         dict[key] ={count:data[obj].rank, rank: data[obj].freq};
-    }    
-    return dict;    
+    }
+    return dict;
 }
 
 
 function stats(data, label){
     var set = {}, alpha={};
     for (var i in label){
-        alpha[label[i]] = {drop:0, add:0, kept:0, max:0};                
+        alpha[label[i]] = {drop:0, add:0, kept:0, max:0};
     }
     for(var a in alpha){
-        for(var key in data){ 
+        for(var key in data){
             var k = key.toUpperCase();
             var max = k.split(a).length-1;
             alpha[a].max += max*data[key].total;
@@ -418,11 +418,11 @@ function stats(data, label){
                 }else if (n==0 && max!=0){
                     alpha[a].kept+=parseInt(vec[v].count);
                 }else if(n<0){
-                    alpha[a].drop += (-1*n)*vec[v].count;    
-                }                       
+                    alpha[a].drop += (-1*n)*vec[v].count;
+                }
             }
-        }                
-    }         
+        }
+    }
     return alpha;
 }
 
@@ -434,7 +434,7 @@ function orderby(str,order){
                     if(isNaN(a.count))
                         return 1;
                     return b.count - a.count;
-                });                
+                });
             } else if (order=='2'){
                 str = str.sort(function(a,b){
                     var iA = letterFreq.indexOf(a.letter.toLowerCase());
@@ -450,17 +450,17 @@ function orderby(str,order){
             matrix.push(aux);
             return {matrix:matrix, lbMatrix:lbMatrx};
         }
-        
+
 
 
 
 function statsMatrixBigraph(data, alpha){
     var set = {};
-    
-    for(var a in alpha){        
+
+    for(var a in alpha){
         for(var b in alpha[a].pair){
             var search = a+b;
-            for(var key in data){ 
+            for(var key in data){
                 var k = key.toUpperCase();
                 var max = k.split(search).length-1;
                 alpha[a].pair[b].max += max*data[key].total;
@@ -468,25 +468,25 @@ function statsMatrixBigraph(data, alpha){
                 for(var v in vec){
                     var ab = vec[v].abbr.toUpperCase();
                     var n = ab.split(search).length-1;
-                    n = n-max;                  
-                                     
+                    n = n-max;
+
                     if (n>0){
                         alpha[a].pair[b].add += n*vec[v].count;
                     }else if (n==0 && max!=0){
                         alpha[a].pair[b].kept+=parseInt(vec[v].count);
                     }else if(n<0){
                         alpha[a].pair[b].drop += (-1*n)*vec[v].count;
-                    }                       
+                    }
                 }
-            } 
+            }
         }
     }
-    for(var key in data){ 
-        var k = key.toUpperCase();        
+    for(var key in data){
+        var k = key.toUpperCase();
         var vec = data[key].vec;
         for(var v in vec){
             var ab = vec[v].abbr.toUpperCase();
-            
+
             var index = 1;
             for(var i=1; (i<k.length) && (index<ab.length);i++){
                 if (k[i]==ab[index]){
@@ -500,18 +500,18 @@ function statsMatrixBigraph(data, alpha){
                 }
             }
         }
-            
-    }         
+
+    }
     return alpha;
 }
 
 function statsMatrix(data, alpha){
     var set = {};
-    
-    for(var a in alpha){        
+
+    for(var a in alpha){
         for(var b in alpha[a].pair){
             var search = a+b;
-            for(var key in data){ 
+            for(var key in data){
                 var k = key.toUpperCase();
                 var max = k.split(search).length-1;
                 alpha[a].pair[b].max += max*data[key].total;
@@ -530,12 +530,12 @@ function statsMatrix(data, alpha){
                             alpha[a].pair[b].accuracy[vec[v].acc] += parseInt(vec[v].count);
                         else
                             alpha[a].pair[b].accuracy[vec[v].acc] = parseInt(vec[v].count);
-                    }                       
+                    }
                 }
-            } 
+            }
         }
-    }         
-    console.log(alpha);            
+    }
+    console.log(alpha);
     return alpha;
 }
 
@@ -544,9 +544,9 @@ function comPair(word, abbr, alpha){
     word = word.toUpperCase();
     abbr = abbr.toUpperCase();
     for(var w in word){
-        if (word[w]==abbr[i]){   
-        }   
-    }    
+        if (word[w]==abbr[i]){
+        }
+    }
 }
 
 function getLabels(label){
